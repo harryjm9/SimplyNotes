@@ -33,54 +33,114 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login"),
-      ),
       body: Column(
         children: [
-          TextField(
-            controller: _email,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: 'Email'),
+          Stack(
+            children: [
+              ClipPath(
+                clipper: WaveClipper(),
+                child: Container(
+                  height: 200,
+                  color: Colors.orangeAccent[100],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 80.0),
+                child: Center(
+                  child: Text(
+                    'Login',
+                    style: TextStyle(fontSize: 24, color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(hintText: 'Password'),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              child: Text("Email"),
+            ),
           ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                context.read<AuthBloc>().add(
-                      AuthEventLogIn(
-                        email,
-                        password,
-                      ),
-                    );
-              } on UserNotFoundAuthException {
-                await showErrorDialog(
-                  context,
-                  'User not found',
-                );
-              } on WrongPasswordAuthException {
-                await showErrorDialog(
-                  context,
-                  'Incorrect Password',
-                );
-              } on GenericAuthException {
-                await showErrorDialog(
-                  context,
-                  'Authentication error',
-                );
-              }
-            },
-            child: const Text('Login'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: TextField(
+              cursorColor: Colors.orange,
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.grey[300],
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                child: Text("Password")),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: TextField(
+              cursorColor: Colors.orange,
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.grey[300],
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 30, 0, 20),
+            child: FloatingActionButton.extended(
+              label: const Text('Login'),
+              backgroundColor: Colors.orange,
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                try {
+                  context.read<AuthBloc>().add(
+                        AuthEventLogIn(
+                          email,
+                          password,
+                        ),
+                      );
+                } on UserNotFoundAuthException {
+                  await showErrorDialog(
+                    context,
+                    'User not found',
+                  );
+                } on WrongPasswordAuthException {
+                  await showErrorDialog(
+                    context,
+                    'Incorrect Password',
+                  );
+                } on GenericAuthException {
+                  await showErrorDialog(
+                    context,
+                    'Authentication error',
+                  );
+                }
+              },
+            ),
           ),
           TextButton(
               onPressed: () {
@@ -91,9 +151,30 @@ class _LoginViewState extends State<LoginView> {
               },
               child: const Text(
                 "Not Registered yet? Register Here!",
+                style: TextStyle(color: Colors.orange),
               ))
         ],
       ),
     );
   }
+}
+
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final curveHeight = 30.0;
+    final curveWidth = size.width / 4;
+    path.lineTo(0, size.height - curveHeight);
+    path.quadraticBezierTo(
+        curveWidth, size.height, size.width / 2, size.height - curveHeight);
+    path.quadraticBezierTo(size.width - curveWidth,
+        size.height - 2 * curveHeight, size.width, size.height - curveHeight);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(WaveClipper oldClipper) => false;
 }

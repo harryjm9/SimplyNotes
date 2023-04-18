@@ -30,14 +30,9 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Notes'),
+        centerTitle: true,
+        title: const Text('My Notes'),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(createOrUpdateNoteRoute);
-            },
-            icon: const Icon(Icons.add),
-          ),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
@@ -76,10 +71,10 @@ class _NotesViewState extends State<NotesView> {
               if (snapshot.hasData) {
                 final allNotes = snapshot.data as Iterable<CloudNote>;
                 return NotesListView(
-                  notes: allNotes,
                   onDeleteNote: (note) async {
                     await _notesService.deleteNote(documentId: note.documentId);
                   },
+                  notes: allNotes,
                   onTap: (note) {
                     Navigator.of(context).pushNamed(
                       createOrUpdateNoteRoute,
@@ -95,6 +90,13 @@ class _NotesViewState extends State<NotesView> {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(createOrUpdateNoteRoute);
+        },
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
