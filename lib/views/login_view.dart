@@ -4,6 +4,7 @@ import 'package:simply_notes/constants/routes.dart';
 import 'package:simply_notes/services/auth/auth_exceptions.dart';
 import 'package:simply_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:simply_notes/services/auth/bloc/auth_event.dart';
+import 'package:simply_notes/services/auth/bloc/auth_state.dart';
 import '../utilities/dialogs/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -110,36 +111,31 @@ class _LoginViewState extends State<LoginView> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 30, 0, 20),
-            child: FloatingActionButton.extended(
-              label: const Text('Login'),
-              backgroundColor: Colors.orange,
-              onPressed: () async {
-                final email = _email.text;
-                final password = _password.text;
-                try {
+            child: BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) async {
+                if (state is AuthStateLoggedOut) {
+                  if (state.exception is UserNotFoundAuthException ||
+                      state.exception is WrongPasswordAuthException) {
+                    await showErrorDialog(context, 'Wrong credentials');
+                  } else if (state.exception is GenericAuthException) {
+                    await showErrorDialog(context, 'Authentication Error');
+                  }
+                }
+              },
+              child: FloatingActionButton.extended(
+                label: const Text('Login'),
+                backgroundColor: Colors.orange,
+                onPressed: () async {
+                  final email = _email.text;
+                  final password = _password.text;
                   context.read<AuthBloc>().add(
                         AuthEventLogIn(
                           email,
                           password,
                         ),
                       );
-                } on UserNotFoundAuthException {
-                  await showErrorDialog(
-                    context,
-                    'User not found',
-                  );
-                } on WrongPasswordAuthException {
-                  await showErrorDialog(
-                    context,
-                    'Incorrect Password',
-                  );
-                } on GenericAuthException {
-                  await showErrorDialog(
-                    context,
-                    'Authentication error',
-                  );
-                }
-              },
+                },
+              ),
             ),
           ),
           TextButton(
