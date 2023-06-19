@@ -30,6 +30,8 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.orangeAccent[100],
+        foregroundColor: Colors.black,
         centerTitle: true,
         title: const Text('My Notes'),
         actions: [
@@ -90,6 +92,8 @@ class _NotesViewState extends State<NotesView> {
         onPressed: () {
           Navigator.of(context).pushNamed(createOrUpdateNoteRoute);
         },
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.black,
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:simply_notes/helpers/loading/loading_screen_controller.dart';
+import 'loading_screen_controller.dart';
 
 class LoadingScreen {
   factory LoadingScreen() => _shared;
@@ -25,7 +25,7 @@ class LoadingScreen {
   }
 
   void hide() {
-    controller?.close;
+    controller?.close();
     controller = null;
   }
 
@@ -35,9 +35,11 @@ class LoadingScreen {
   }) {
     final _text = StreamController<String>();
     _text.add(text);
+
     final state = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
     final size = renderBox.size;
+
     final overlay = OverlayEntry(
       builder: (context) {
         return Material(
@@ -64,6 +66,7 @@ class LoadingScreen {
                         const CircularProgressIndicator(),
                         const SizedBox(height: 20),
                         StreamBuilder(
+                          stream: _text.stream,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text(
@@ -74,8 +77,7 @@ class LoadingScreen {
                               return Container();
                             }
                           },
-                          stream: _text.stream,
-                        )
+                        ),
                       ],
                     ),
                   ),
