@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:simply_notes/services/auth/auth_service.dart';
 import 'package:simply_notes/utilities/generics/get_arguments.dart';
-import 'package:simply_notes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:simply_notes/services/cloud/cloud_note.dart';
 import 'package:simply_notes/services/cloud/firebase_cloud_storage.dart';
 
@@ -17,6 +15,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   CloudNote? _note;
   late final FirebaseCloudStorage _notesService;
   late final TextEditingController _textController;
+  bool noteSaved = false;
 
   @override
   void initState() {
@@ -52,6 +51,13 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
   }
 
+  void _deleteNote() {
+    final note = _note;
+    if (note != null) {
+      _notesService.deleteNote(documentId: note.documentId);
+    }
+  }
+
   void _saveNoteIfTextNotEmpty() async {
     final note = _note;
     final text = _textController.text;
@@ -65,7 +71,11 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   @override
   void dispose() {
-    _deleteNoteIfTextIsEmpty();
+    if (noteSaved) {
+      _deleteNoteIfTextIsEmpty();
+    } else {
+      _deleteNote();
+    }
     _textController.dispose();
     super.dispose();
   }
@@ -79,17 +89,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         title: const Text('New Note'),
         actions: [
           IconButton(
-              onPressed: () async {
-                final text = _textController.text;
-                if (_note == null || text.isEmpty) {
-                  await showCannotShareEmptyNoteDialog(context);
-                } else {
-                  Share.share(text);
-                }
-              },
-              icon: const Icon(Icons.share)),
-          IconButton(
             onPressed: () {
+              noteSaved = true;
               _saveNoteIfTextNotEmpty();
               Navigator.pop(context);
             },
